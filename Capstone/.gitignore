@@ -1,0 +1,23 @@
+# Virtual Environment
+.venv/
+venv/
+ENV/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Model Weights & Datasets
+yolo11n.pt
+models/*.pt
+runs/
+
+# Node / JS
+node_modules/
+
+# OS & IDE Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

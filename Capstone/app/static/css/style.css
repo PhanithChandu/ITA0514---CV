@@ -1,0 +1,296 @@
+:root {
+  --primary: #f97316;
+  --primary-hover: #ea580c;
+  --primary-light: #fff7ed;
+  --bg: #09090b;
+  --surface: #121215;
+  --surface-border: #27272a;
+  --surface-hover: #1c1c21;
+  --text: #fafafa;
+  --text-muted: #a1a1aa;
+  --emerald: #10b981;
+  --blue: #3b82f6;
+  --purple: #8b5cf6;
+  --red: #ef4444;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
+}
+
+* {
+  font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Background gradient glow */
+.bg-glow {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(249, 115, 22, 0.08) 0%, transparent 70%),
+              radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.04) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Glassmorphism Panel */
+.glass-panel {
+  background: rgba(18, 18, 21, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--surface-border);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+  transition: all 0.4s var(--ease-out-expo);
+}
+
+.glass-panel.hover-effect:hover {
+  border-color: rgba(249, 115, 22, 0.4);
+  box-shadow: 0 25px 50px -12px rgba(249, 115, 22, 0.15);
+}
+
+/* Navigation Items */
+.nav-tab {
+  cursor: pointer;
+  padding: 10px 18px;
+  border-radius: 10px;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s var(--ease-out-expo);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  background: transparent;
+  border: none;
+}
+
+.nav-tab:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-tab.active {
+  color: #ffffff;
+  background: var(--primary);
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+}
+
+/* Page content animation */
+.page-content {
+  display: none;
+}
+
+.page-content.active {
+  display: block;
+  animation: fadeIn 0.4s var(--ease-out-expo) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Buttons */
+.btn-primary {
+  background: var(--primary);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: 600;
+  padding: 12px 24px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.3s var(--ease-out-expo);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  color: var(--text);
+  font-weight: 600;
+  padding: 12px 24px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.3s var(--ease-out-expo);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Drag & Drop Upload Zone */
+.upload-zone {
+  border: 2px dashed var(--surface-border);
+  border-radius: 20px;
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.4s var(--ease-out-expo);
+  background: rgba(18, 18, 21, 0.5);
+}
+
+.upload-zone:hover, .upload-zone.dragover {
+  border-color: var(--primary);
+  background: rgba(249, 115, 22, 0.05);
+  transform: scale(1.01);
+}
+
+/* Custom Range Sliders */
+.custom-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: #27272a;
+  outline: none;
+  width: 100%;
+  transition: background 0.3s;
+}
+
+.custom-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
+  transition: transform 0.2s var(--ease-out-expo);
+}
+
+.custom-range::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Toggle Switch */
+.toggle-wrap {
+  position: relative;
+  width: 48px;
+  height: 26px;
+  cursor: pointer;
+}
+
+.toggle-wrap input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  border-radius: 13px;
+  background: #27272a;
+  transition: .4s var(--ease-out-expo);
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  transition: .4s var(--ease-out-expo);
+}
+
+input:checked ~ .toggle-track {
+  background: var(--primary);
+}
+
+input:checked ~ .toggle-thumb {
+  transform: translateX(22px);
+}
+
+/* Status Chips & Metrics */
+.metric-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--surface-border);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Pulsing Status Dot */
+@keyframes pulseDot {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--emerald);
+  display: inline-block;
+  animation: pulseDot 2s infinite;
+}
+
+.status-dot.off {
+  background: var(--red);
+  animation: none;
+}
+
+/* Event Log Items */
+.log-item {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid #27272a;
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+}
+
+.log-item:hover {
+  border-color: rgba(249, 115, 22, 0.4);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}

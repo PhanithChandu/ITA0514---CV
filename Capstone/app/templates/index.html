@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YOLO Vision Pro — Enterprise Real-Time Object Detection Platform</title>
+  <meta name="description" content="High-performance object detection platform powered by YOLOv11 and FastAPI WebSocket backend with real-time streaming, static image scanning, and video processing." />
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen relative flex flex-col">
+  <div class="bg-glow"></div>
+  
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed top-24 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Header / Navigation -->
+  <header class="sticky top-0 z-40 bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-800">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-4">
+        <div class="w-11 h-11 bg-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20 transform transition hover:rotate-6">
+          <i data-lucide="focus" class="w-6 h-6 text-black"></i>
+        </div>
+        <div>
+          <h1 class="font-extrabold text-xl tracking-tight text-white flex items-center gap-2">
+            YOLO Vision Pro <span class="text-[0.65rem] px-2 py-0.5 rounded bg-orange-500/20 text-orange-400 font-mono font-bold uppercase">v11 Engine</span>
+          </h1>
+          <p class="text-xs text-zinc-400 mt-0.5">Real-Time Computer Vision & Analytics Platform</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex items-center gap-2 bg-zinc-900/60 p-1.5 rounded-xl border border-zinc-800/80">
+        <button id="nav-overview" class="nav-tab active" onclick="switchTab('overview')">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Overview
+        </button>
+        <button id="nav-image" class="nav-tab" onclick="switchTab('image')">
+          <i data-lucide="image" class="w-4 h-4"></i> Image Studio
+        </button>
+        <button id="nav-video" class="nav-tab" onclick="switchTab('video')">
+          <i data-lucide="film" class="w-4 h-4"></i> Video Studio
+        </button>
+        <button id="nav-webcam" class="nav-tab" onclick="switchTab('webcam')">
+          <i data-lucide="video" class="w-4 h-4"></i> Live Webcam
+        </button>
+      </nav>
+
+      <!-- System Status Badge -->
+      <div id="system-status" class="metric-chip text-xs">
+        <span class="status-dot"></span> Checking Status...
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-6 py-8 flex-1 w-full">
+
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <!-- WORKSPACE 1: OVERVIEW & DASHBOARD -->
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <section id="page-overview" class="page-content active space-y-8">
+      
+      <!-- Hero Banner -->
+      <div class="glass-panel p-8 md:p-12 relative overflow-hidden">
+        <div class="max-w-3xl relative z-10">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400 text-xs font-semibold mb-4">
+            <i data-lucide="zap" class="w-3.5 h-3.5"></i> Enterprise Computer Vision Platform
+          </div>
+          <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
+            Ultra Low-Latency Object Detection powered by <span class="text-orange-500">YOLOv11</span>
+          </h2>
+          <p class="text-zinc-400 text-base md:text-lg leading-relaxed mb-8">
+            Engineered for maximum CPU performance with OpenCV pre-resizing, lock-free ring-buffer threading, and real-time WebSocket communication. Scan static images, process uploaded video files, or stream live camera feeds directly from your browser.
+          </p>
+          
+          <div class="flex flex-wrap gap-4">
+            <button class="btn-primary" onclick="switchTab('image')">
+              <i data-lucide="image" class="w-4 h-4 mr-2"></i> Scan Image
+            </button>
+            <button class="btn-secondary" onclick="switchTab('webcam')">
+              <i data-lucide="video" class="w-4 h-4 mr-2"></i> Launch Live Stream
+            </button>
+          </div>
+        </div>
+
+        <div class="absolute -right-12 -bottom-12 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      </div>
+
+      <!-- Feature Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div class="glass-panel p-6 hover-effect cursor-pointer" onclick="switchTab('image')">
+          <div class="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center mb-4 text-orange-400">
+            <i data-lucide="image" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">Static Image Scanning</h3>
+          <p class="text-zinc-400 text-sm leading-relaxed mb-4">
+            Upload high-res JPG/PNG images for instant object identification, class summary statistics, bounding box coordinates, and downloadable JSON annotations.
+          </p>
+          <span class="text-xs font-bold text-orange-400 flex items-center gap-1">Open Studio <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></span>
+        </div>
+
+        <div class="glass-panel p-6 hover-effect cursor-pointer" onclick="switchTab('video')">
+          <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center mb-4 text-blue-400">
+            <i data-lucide="film" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">Video Batch Processing</h3>
+          <p class="text-zinc-400 text-sm leading-relaxed mb-4">
+            Process MP4 and WebM video files frame-by-frame with dynamic overlay canvas rendering, real-time FPS meters, and timestamped event tracking logs.
+          </p>
+          <span class="text-xs font-bold text-blue-400 flex items-center gap-1">Open Studio <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></span>
+        </div>
+
+        <div class="glass-panel p-6 hover-effect cursor-pointer" onclick="switchTab('webcam')">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mb-4 text-emerald-400">
+            <i data-lucide="video" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">Live Webcam Streaming</h3>
+          <p class="text-zinc-400 text-sm leading-relaxed mb-4">
+            Connect local webcam streams over full-duplex WebSockets with adjustable transmission resolution, JPEG compression quality, and real-time threshold sliders.
+          </p>
+          <span class="text-xs font-bold text-emerald-400 flex items-center gap-1">Launch Stream <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></span>
+        </div>
+
+      </div>
+
+      <!-- How YOLO Works Section -->
+      <div class="glass-panel p-8">
+        <h3 class="text-2xl font-extrabold text-white mb-6 flex items-center gap-3">
+          <i data-lucide="cpu" class="w-6 h-6 text-orange-500"></i> Architecture & Optimizations
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800">
+            <div class="font-mono text-xs text-orange-400 font-bold mb-1">01. PRE-RESIZING</div>
+            <div class="font-bold text-white mb-1">Aspect-Ratio Scale</div>
+            <p class="text-zinc-400 text-xs">OpenCV resizes frames before model evaluation, projecting bounding box coordinates accurately back to original image space.</p>
+          </div>
+          <div class="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800">
+            <div class="font-mono text-xs text-orange-400 font-bold mb-1">02. RING BUFFER</div>
+            <div class="font-bold text-white mb-1">Lock-Free Queues</div>
+            <p class="text-zinc-400 text-xs">Depth-1 input queue drops stale frames, preventing queue latency and ensuring high FPS streaming on CPU.</p>
+          </div>
+          <div class="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800">
+            <div class="font-mono text-xs text-orange-400 font-bold mb-1">03. WEBSOCKET PIPELINE</div>
+            <div class="font-bold text-white mb-1">Full-Duplex WS</div>
+            <p class="text-zinc-400 text-xs">Binary JPEG frames stream up while JSON detection metadata and base64 rendered frames stream down continuously.</p>
+          </div>
+          <div class="p-4 rounded-xl bg-zinc-900/60 border border-zinc-800">
+            <div class="font-mono text-xs text-orange-400 font-bold mb-1">04. THRESHOLD TUNING</div>
+            <div class="font-bold text-white mb-1">Interactive Sliders</div>
+            <p class="text-zinc-400 text-xs">Dynamic Confidence and IoU threshold controls update backend inference filters instantly without reloading.</p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <!-- WORKSPACE 2: STATIC IMAGE DETECTION STUDIO -->
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <section id="page-image" class="page-content space-y-8">
+      
+      <!-- Studio Header -->
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-extrabold text-white flex items-center gap-3">
+            <i data-lucide="image" class="w-6 h-6 text-orange-500"></i> Static Image Studio
+          </h2>
+          <p class="text-zinc-400 text-sm">Upload an image file to run object detection with real-time threshold controls.</p>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <button id="btn-download-image" class="btn-secondary text-xs py-2 px-4">
+            <i data-lucide="download" class="w-4 h-4 mr-2"></i> Download Image
+          </button>
+          <button id="btn-export-json" class="btn-primary text-xs py-2 px-4">
+            <i data-lucide="file-json" class="w-4 h-4 mr-2"></i> Export JSON
+          </button>
+        </div>
+      </div>
+
+      <!-- Drag & Drop Upload Zone -->
+      <div id="image-dropzone" class="upload-zone">
+        <input type="file" id="image-input" accept="image/*" class="hidden" />
+        <div class="w-16 h-16 rounded-2xl bg-orange-500/10 border border-orange-500/30 text-orange-400 flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="upload-cloud" class="w-8 h-8"></i>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-1">Click to upload or drag & drop image</h3>
+        <p class="text-zinc-500 text-xs">Supports JPG, PNG, WEBP formats up to 25MB</p>
+      </div>
+
+      <!-- Image Processing Workspace -->
+      <div id="image-workspace" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Left 2 Cols: Image Display -->
+        <div class="lg:col-span-2 space-y-4">
+          <div class="glass-panel p-4 relative min-h-[400px] flex items-center justify-center">
+            <div id="image-spinner" class="hidden absolute inset-0 bg-zinc-950/70 backdrop-blur-sm z-20 flex flex-col items-center justify-center gap-3 rounded-xl">
+              <i data-lucide="loader-2" class="w-8 h-8 text-orange-500 animate-spin"></i>
+              <span class="text-xs font-mono font-bold text-zinc-300">Processing YOLOv11 Inference...</span>
+            </div>
+            
+            <img id="image-result-preview" class="max-h-[600px] w-auto h-auto rounded-lg object-contain" alt="YOLO Detection Result" />
+          </div>
+
+          <!-- Original Preview Reference -->
+          <div class="glass-panel p-4 flex items-center gap-4">
+            <div class="text-xs font-bold text-zinc-400 uppercase tracking-wider font-mono">Original Reference:</div>
+            <img id="image-orig-preview" class="w-20 h-14 object-cover rounded-lg border border-zinc-800" alt="Original Upload" />
+          </div>
+        </div>
+
+        <!-- Right 1 Col: Controls & Detection Results -->
+        <div class="space-y-6">
+          
+          <!-- Parameters Card -->
+          <div class="glass-panel p-6 space-y-6">
+            <h3 class="text-sm font-extrabold uppercase tracking-wider text-white flex items-center gap-2">
+              <i data-lucide="sliders" class="w-4 h-4 text-orange-500"></i> Detection Filters
+            </h3>
+
+            <!-- Confidence Slider -->
+            <div>
+              <div class="flex justify-between text-xs font-bold mb-2">
+                <span class="text-zinc-300">Confidence Threshold</span>
+                <span id="image-conf-val" class="font-mono text-orange-400">0.40</span>
+              </div>
+              <input type="range" id="image-conf-slider" class="custom-range" min="0.10" max="0.95" step="0.05" value="0.40" />
+            </div>
+
+            <!-- IoU Slider -->
+            <div>
+              <div class="flex justify-between text-xs font-bold mb-2">
+                <span class="text-zinc-300">NMS IoU Threshold</span>
+                <span id="image-iou-val" class="font-mono text-orange-400">0.45</span>
+              </div>
+              <input type="range" id="image-iou-slider" class="custom-range" min="0.10" max="0.95" step="0.05" value="0.45" />
+            </div>
+
+            <!-- Performance Metrics Grid -->
+            <div class="grid grid-cols-3 gap-2 pt-2 border-t border-zinc-800 text-center">
+              <div class="p-2 rounded-lg bg-zinc-900/60 border border-zinc-800">
+                <div class="text-[0.65rem] text-zinc-500 font-mono font-bold">LATENCY</div>
+                <div id="img-stat-time" class="text-xs font-bold text-orange-400 font-mono">-- ms</div>
+              </div>
+              <div class="p-2 rounded-lg bg-zinc-900/60 border border-zinc-800">
+                <div class="text-[0.65rem] text-zinc-500 font-mono font-bold">OBJECTS</div>
+                <div id="img-stat-objects" class="text-xs font-bold text-emerald-400 font-mono">0</div>
+              </div>
+              <div class="p-2 rounded-lg bg-zinc-900/60 border border-zinc-800">
+                <div class="text-[0.65rem] text-zinc-500 font-mono font-bold">RESOLUTION</div>
+                <div id="img-stat-dims" class="text-[0.65rem] font-bold text-white font-mono">--</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Class Summary Badges -->
+          <div class="glass-panel p-6">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-white mb-3 flex items-center gap-2">
+              <i data-lucide="layers" class="w-4 h-4 text-orange-500"></i> Detected Classes
+            </h3>
+            <div id="image-class-summary" class="flex flex-wrap gap-2">
+              <span class="text-xs text-zinc-500">Awaiting detection results...</span>
+            </div>
+          </div>
+
+          <!-- Detailed Detections List -->
+          <div class="glass-panel p-6">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-white mb-4 flex items-center gap-2">
+              <i data-lucide="list" class="w-4 h-4 text-orange-500"></i> Bounding Box Details
+            </h3>
+            <div id="image-det-list" class="max-h-[300px] overflow-y-auto space-y-2 pr-1">
+              <p class="text-center text-xs text-zinc-500 py-6">Upload an image to view detected bounding box coordinates.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <!-- WORKSPACE 3: VIDEO BATCH PROCESSING STUDIO -->
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <section id="page-video" class="page-content space-y-8">
+      
+      <div>
+        <h2 class="text-2xl font-extrabold text-white flex items-center gap-3">
+          <i data-lucide="film" class="w-6 h-6 text-blue-500"></i> Video Processing Studio
+        </h2>
+        <p class="text-zinc-400 text-sm">Upload video files for low-latency detection canvas overlay and timestamp logging.</p>
+      </div>
+
+      <!-- Video Upload Dropzone -->
+      <div id="video-dropzone" class="upload-zone">
+        <input type="file" id="video-input" accept="video/*" class="hidden" />
+        <div class="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="video" class="w-8 h-8"></i>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-1">Click to upload or drag & drop video</h3>
+        <p class="text-zinc-500 text-xs">Supports MP4, WEBP, MOV video formats</p>
+      </div>
+
+      <!-- Video Workspace -->
+      <div id="video-workspace" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Left 2 Cols: Video Player Canvas -->
+        <div class="lg:col-span-2 space-y-4">
+          <div class="glass-panel p-2 relative aspect-video bg-black rounded-2xl overflow-hidden">
+            <video id="video-player" class="hidden" playsinline loop></video>
+            <canvas id="video-canvas" class="w-full h-full object-contain rounded-xl"></canvas>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <button id="video-play-btn" class="btn-primary">
+              <i data-lucide="play" class="w-4 h-4 mr-2"></i> Play Video
+            </button>
+
+            <div class="flex items-center gap-3">
+              <div class="metric-chip"><i data-lucide="zap" class="w-3.5 h-3.5 text-orange-400"></i><span id="video-stat-fps">-- FPS</span></div>
+              <div class="metric-chip"><i data-lucide="timer" class="w-3.5 h-3.5 text-blue-400"></i><span id="video-stat-ms">-- ms</span></div>
+              <div class="metric-chip"><i data-lucide="boxes" class="w-3.5 h-3.5 text-emerald-400"></i><span id="video-stat-count">0 objects</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right 1 Col: Controls & Event Log -->
+        <div class="space-y-6">
+          <div class="glass-panel p-6 space-y-6">
+            <h3 class="text-sm font-extrabold uppercase tracking-wider text-white">Detection Parameters</h3>
+            
+            <div>
+              <div class="flex justify-between text-xs font-bold mb-2">
+                <span class="text-zinc-300">Confidence Threshold</span>
+                <span id="video-conf-val" class="font-mono text-orange-400">0.40</span>
+              </div>
+              <input type="range" id="video-conf-slider" class="custom-range" min="0.10" max="0.95" step="0.05" value="0.40" />
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs font-bold mb-2">
+                <span class="text-zinc-300">IoU Threshold</span>
+                <span id="video-iou-val" class="font-mono text-orange-400">0.45</span>
+              </div>
+              <input type="range" id="video-iou-slider" class="custom-range" min="0.10" max="0.95" step="0.05" value="0.45" />
+            </div>
+          </div>
+
+          <!-- Video Timeline Event Log -->
+          <div class="glass-panel p-6">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-white mb-4 flex items-center gap-2">
+              <i data-lucide="clock" class="w-4 h-4 text-blue-400"></i> Timeline Detections
+            </h3>
+            <div id="video-event-log" class="max-h-[350px] overflow-y-auto space-y-2 pr-1">
+              <p class="text-center text-xs text-zinc-500 py-6">Play video to stream detection events.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <!-- WORKSPACE 4: LIVE WEBCAM STREAM STUDIO -->
+    <!-- ════════════════════════════════════════════════════════════════════ -->
+    <section id="page-webcam" class="page-content space-y-8">
+      
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-extrabold text-white flex items-center gap-3">
+            <i data-lucide="video" class="w-6 h-6 text-emerald-500"></i> Live Webcam Feed
+          </h2>
+          <p class="text-zinc-400 text-sm">Real-time object detection stream over full-duplex WebSockets.</p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="metric-chip"><span id="webcam-status-dot" class="status-dot off"></span><span id="webcam-status-label">Offline</span></div>
+          <div class="metric-chip text-orange-400"><i data-lucide="zap" class="w-3.5 h-3.5"></i><span id="webcam-stat-fps">-- FPS</span></div>
+          <div class="metric-chip text-blue-400"><i data-lucide="timer" class="w-3.5 h-3.5"></i><span id="webcam-stat-ms">-- ms</span></div>
+          <div class="metric-chip text-emerald-400"><i data-lucide="wifi" class="w-3.5 h-3.5"></i><span id="webcam-stat-tx">-- tx/s</span></div>
+          <div class="metric-chip text-white"><i data-lucide="boxes" class="w-3.5 h-3.5 text-orange-400"></i><span id="webcam-stat-count">0 objects</span></div>
+        </div>
+      </div>
+
+      <!-- Main Live Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Video Canvas Feed -->
+        <div class="lg:col-span-2">
+          <div class="glass-panel p-2 relative aspect-video bg-black rounded-2xl overflow-hidden border-2 border-zinc-800">
+            <video id="webcam-video" class="hidden" autoplay playsinline muted></video>
+            <canvas id="webcam-canvas" class="w-full h-full object-contain rounded-xl"></canvas>
+            
+            <div id="webcam-overlay" class="absolute inset-0 bg-zinc-950/90 flex flex-col items-center justify-center gap-4 text-zinc-500 z-10">
+              <i data-lucide="video-off" class="w-16 h-16 opacity-40 text-zinc-400"></i>
+              <span class="text-sm font-bold uppercase tracking-wider font-mono">Camera Feed Offline</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls & Event Log -->
+        <div class="space-y-6">
+          <div class="glass-panel p-6 space-y-6">
+            <h3 class="text-sm font-extrabold uppercase tracking-wider text-white">Stream Controls</h3>
+
+            <div class="flex gap-3">
+              <button id="webcam-start-btn" class="btn-primary flex-1 py-3">
+                <i data-lucide="play" class="w-4 h-4 mr-2"></i> Start Camera
+              </button>
+              <button id="webcam-stop-btn" class="btn-secondary flex-1 py-3" disabled>
+                <i data-lucide="square" class="w-4 h-4 mr-2"></i> Stop
+              </button>
+            </div>
+
+            <!-- Inference Toggle -->
+            <div class="flex items-center justify-between p-3 bg-zinc-900/60 rounded-xl border border-zinc-800">
+              <div>
+                <div class="text-xs font-bold text-white">YOLO AI Inference</div>
+                <div class="text-[0.65rem] text-zinc-500">Toggle bounding box detection</div>
+              </div>
+              <label class="toggle-wrap">
+                <input type="checkbox" id="webcam-toggle" checked />
+                <div class="toggle-track"></div>
+                <div class="toggle-thumb"></div>
+              </label>
+            </div>
+
+            <!-- Resolution Selector -->
+            <div>
+              <label class="text-xs font-bold text-zinc-300 block mb-2">Transmission Resolution</label>
+              <select id="webcam-res-select" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl text-xs font-bold text-white p-3 outline-none focus:border-orange-500 transition-colors">
+                <option value="320x180">320×180 (Maximum Speed)</option>
+                <option value="480x270">480×270 (Balanced Speed)</option>
+                <option value="640x360" selected>640×360 (Default HQ)</option>
+                <option value="1280x720">1280×720 (Max Resolution)</option>
+              </select>
+            </div>
+
+            <!-- Compression Quality -->
+            <div>
+              <div class="flex justify-between text-xs font-bold mb-2">
+                <span class="text-zinc-300">JPEG Compression</span>
+                <span id="webcam-qual-val" class="font-mono text-orange-400">0.78</span>
+              </div>
+              <input type="range" id="webcam-qual-slider" class="custom-range" min="50" max="95" value="78"
+                oninput="document.getElementById('webcam-qual-val').textContent=(this.value/100).toFixed(2)" />
+            </div>
+
+            <!-- Confidence Slider -->
+            <div>
+              <div class="flex justify-between text-xs font-bold mb-2">
+                <span class="text-zinc-300">Confidence Threshold</span>
+                <span id="webcam-conf-val" class="font-mono text-orange-400">0.40</span>
+              </div>
+              <input type="range" id="webcam-conf-slider" class="custom-range" min="0.10" max="0.95" step="0.05" value="0.40" />
+            </div>
+
+            <!-- IoU Slider -->
+            <div>
+              <div class="flex justify-between text-xs font-bold mb-2">
+                <span class="text-zinc-300">IoU Threshold</span>
+                <span id="webcam-iou-val" class="font-mono text-orange-400">0.45</span>
+              </div>
+              <input type="range" id="webcam-iou-slider" class="custom-range" min="0.10" max="0.95" step="0.05" value="0.45" />
+            </div>
+
+          </div>
+
+          <!-- Detection Event Stream Log -->
+          <div class="glass-panel p-6">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-white mb-4 flex items-center gap-2">
+              <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i> Live Detections Stream
+            </h3>
+            <div id="webcam-event-log" class="max-h-[250px] overflow-y-auto space-y-2 pr-1">
+              <p class="text-center text-xs text-zinc-500 py-6">Awaiting camera start...</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-zinc-800 bg-zinc-950/80 py-6 text-center text-xs text-zinc-500">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div>YOLO Vision Pro &copy; 2026 — Optimized CPU Object Detection Platform</div>
+      <div class="flex gap-4 font-mono">
+        <span>PyTorch</span> • <span>YOLOv11</span> • <span>FastAPI</span> • <span>WebSockets</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    lucide.createIcons();
+  </script>
+  <script src="/static/js/dashboard.js"></script>
+  <script src="/static/js/image_studio.js"></script>
+  <script src="/static/js/video_studio.js"></script>
+  <script src="/static/js/webcam_stream.js"></script>
+</body>
+</html>

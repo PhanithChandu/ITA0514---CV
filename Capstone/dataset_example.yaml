@@ -1,0 +1,18 @@
+# Dataset Configuration for CNN Object Detection Training
+# ----------------------------------------------------
+# Directory paths relative to project root:
+path: ./dataset      # Dataset root directory
+train: images/train  # Training images subdirectory
+val: images/val      # Validation images subdirectory
+test: images/test    # Optional test images subdirectory
+
+# Class names mapping:
+names:
+  0: person
+  1: bicycle
+  2: car
+  3: motorcycle
+  4: airplane
+  5: bus
+  6: train
+  7: truck
